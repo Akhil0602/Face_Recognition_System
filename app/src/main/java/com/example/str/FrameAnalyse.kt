@@ -4,12 +4,12 @@ package com.example.str
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.graphics.*
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import androidx.core.content.ContextCompat.startActivity
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
@@ -21,10 +21,11 @@ import kotlinx.coroutines.withContext
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+
 class FrameAnalyse(
-    private var context: Context,
-    private var boundingBoxOverlay: OverlayBox,
-    private var model: FaceModel
+        private var context: Context,
+        private var boundingBoxOverlay: OverlayBox,
+        private var model: FaceModel
 ): ImageAnalysis.Analyzer {
 
     lateinit var bestScoreUserName:String
@@ -49,13 +50,13 @@ class FrameAnalyse(
 
     @SuppressLint("UnsafeOptInUsageError")
     override fun analyze(image: ImageProxy) {
-       // Log.w("fun","analyse")
+        //Log.w("Faces",faceList.size.toString())
         if (isProcessing || faceList.size == 0) {
             image.close()
             return
         } else {
             isProcessing = true
-
+         //   Log.w("fun","analyse")
             val frameBitmap = BM.imageToBitmap(image.image!!, image.imageInfo.rotationDegrees)
 
             val inputImage = InputImage.fromMediaImage(image.image, image.imageInfo.rotationDegrees)
@@ -76,14 +77,24 @@ class FrameAnalyse(
 
     private suspend fun runModel(faces: List<Face>, cameraFrameBitmap: Bitmap){
         withContext(Dispatchers.Default) {
+           // Log.w("run","Model")
+            if(faces.size==0)
+            {
+                Handler(Looper.getMainLooper()).post(Runnable { //do stuff like remove view etc
+                    SetText.set("No Face Found")
+                })
+            }
             for (face in faces) {
+        //        Log.w("1", "000")
                 try {
                     val croppedBitmap = BM.cropRectFromBitmap(cameraFrameBitmap, face.boundingBox)
                     subject = model.getFaceEmbedding(croppedBitmap)
+                 //   Log.w("1", "-1")
 
                         for ( i in 0 until faceList.size ) {
-
+                        //    Log.w("1", "0")
                             if ( nameScoreHashmap[faceList[i].first] == null ) {
+                              //  Log.w("1", "1")
                                 // Compute the L2 norm and then append it to the ArrayList.
                                 val p = ArrayList<Float>()
                                 if ( metricToBeUsed == "cosine" ) {
@@ -96,20 +107,22 @@ class FrameAnalyse(
                             }
                             // If this cluster exists, append the L2 norm/cosine score to it.
                             else {
+                              //  Log.w("1", "2")
                                 if ( metricToBeUsed == "cosine" ) {
                                     nameScoreHashmap[faceList[i].first]?.add(
-                                        cosineSimilarity(
-                                            subject,
-                                            faceList[i].second
-                                        )
+                                            cosineSimilarity(
+                                                    subject,
+                                                    faceList[i].second
+                                            )
                                     )
                                 }
                                 else {
+                                   // Log.w("1", "3")
                                     nameScoreHashmap[faceList[i].first]?.add(
-                                        L2Norm(
-                                            subject,
-                                            faceList[i].second
-                                        )
+                                            L2Norm(
+                                                    subject,
+                                                    faceList[i].second
+                                            )
                                     )
                                 }
                             }
@@ -140,19 +153,20 @@ class FrameAnalyse(
                                 names[avgScores.indexOf(avgScores.minOrNull()!!)]
                             }
                         }
-
+                        Log.w("User", bestScoreUserName)
                         SetText.set(bestScoreUserName)
 
                 }
                 catch (e: Exception) {
                     // If any exception occurs with this box and continue with the next boxes.
-                    Log.e("Model", "Exception in FrameAnalyser : ${e.message}")
+                    Log.w("Model", "Exception in FrameAnalyser : ${e.message}")
                     continue
                 }
             }
             withContext(Dispatchers.Main) {
                 isProcessing = false
             }
+
         }
     }
 

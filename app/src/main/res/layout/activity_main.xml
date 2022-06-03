@@ -14,10 +14,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Face Recognition App"
+        android:background="#8fa399"
+        android:textStyle="bold"
         android:layout_centerHorizontal="true"
         android:textSize="33dp"
         android:layout_marginTop="30dp"
-        android:background="#000000"
+
         android:textColor="#FFFFFF"
         android:textAlignment="center"/>
 
@@ -25,10 +27,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Keep your head within the frame"
+        android:background="#edbeed"
+        android:textStyle="italic"
         android:layout_centerHorizontal="true"
         android:textSize="20dp"
         android:layout_marginTop="100dp"
-        android:background="#000000"
         android:textColor="#FFFFFF"
         android:textAlignment="center"/>
 
@@ -36,24 +39,22 @@
         android:id="@+id/bbo"
         android:layout_width="350dp"
         android:layout_height="350dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        />
+        android:layout_centerInParent="true" />
     <TextView
         android:id="@+id/la"
         android:layout_width="match_parent"
         android:layout_above="@+id/bbo"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginLeft="30.4dp"
+        android:layout_marginRight="30.7dp"
         android:layout_height="10dp"
         android:background="#000000"
         />
     <TextView
         android:layout_width="match_parent"
         android:layout_below="@+id/bbo"
-        android:layout_marginLeft="30dp"
+        android:layout_marginLeft="30.4dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginRight="30.7dp"
         android:layout_height="10dp"
         android:background="#000000"
         />
@@ -99,12 +100,16 @@
         android:padding="5dp"
         android:textColor="#000000"
         android:textAlignment="center"/>
+
     <Button
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="15dp"
-        android:id="@+id/btn"
+        android:id="@+id/adduser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select directory"/>
+        android:layout_alignParentBottom="true"
+        android:backgroundTint="#33ff99"
+        android:text="Add User"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="70dp"
+        android:layout_marginBottom="15dp"
+        />
 </RelativeLayout>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#99ccff">
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add New User"
+        android:layout_marginTop="10dp"
+        android:textSize="40dp"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold" />
+<androidx.camera.view.PreviewView
+    android:id="@+id/capture"
+    android:layout_below="@+id/welcome"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="25dp"
+    />
+    <ImageView
+        android:id="@+id/person"
+        android:rotation="0"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:layout_below="@+id/welcome"
+        android:src="@mipmap/app_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp"/>
+   <!-- <Button
+        android:id="@+id/retake"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="Retake"
+        android:background="@drawable/round"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/person"/>
+    <Button
+        android:id="@+id/confirm"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="Confirm"
+        android:background="@drawable/round"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/person"/>
+    <ImageButton
+        android:id="@+id/cpt_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/frame1"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/round"
+        android:layout_above="@+id/username"
+        android:layout_centerHorizontal="true"
+        />-->
+
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="60dp"
+        android:id="@+id/addimg"
+        android:text="Add image"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/person"
+        android:layout_centerHorizontal="true"/>
+
+    <EditText
+        android:id="@+id/username"
+        android:hint="Name"
+        android:layout_above="@+id/add"
+        android:layout_width="300dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_height="60dp"
+        android:textSize="30dp"
+        />
+    <Button
+        android:id="@+id/add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add User"
+        android:layout_marginBottom="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        />
+
+</RelativeLayout>

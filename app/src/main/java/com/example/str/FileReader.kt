@@ -2,6 +2,7 @@ package com.example.str
 
 import android.graphics.Bitmap
 import android.graphics.Rect
+import android.util.Log
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -73,6 +74,7 @@ class FileReader(private var faceNetModel: FaceModel) {
                             scanImage( data[ imageCounter].first , data[ imageCounter ].second )
                         }
                         else {
+                            Log.w(imageData.size.toString(),numImagesWithNoFaces.toString())
                             callback.onProcessCompleted( imageData , numImagesWithNoFaces )
                             reset()
                         }
