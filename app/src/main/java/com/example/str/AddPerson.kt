@@ -103,8 +103,6 @@ class AddPerson : AppCompatActivity(){
                 Toast.makeText(this,"Please add an image first",Toast.LENGTH_SHORT).show()
             }
             else {
-             //   Toast.makeText(this, x, Toast.LENGTH_SHORT).show()
-
                 val abspth=MainActivity.abspath
 
                 val file = File(abspth + "/" + x)
@@ -136,16 +134,12 @@ class AddPerson : AppCompatActivity(){
                      /*   var intent= Intent(this, MainActivity::class.java)
                         startActivity(intent)*/
                         setResult(Activity.RESULT_OK)
-                    //    Toast.makeText(this,Activity.RESULT_OK.toString()+"RES",Toast.LENGTH_SHORT).show()
-                        //ma.load()
                         finish()
                 }
                 else
                 {
                     Toast.makeText(this, "User already exists.", Toast.LENGTH_SHORT).show()
                 }
-
-
             }
         }
     }
@@ -162,7 +156,6 @@ class AddPerson : AppCompatActivity(){
                 Toast.makeText(this,"Inside",Toast.LENGTH_SHORT).show()
                 img.setImageBitmap(imagee)
                 saveimage.add(imagee)
-                //load()
             }
         }
     }

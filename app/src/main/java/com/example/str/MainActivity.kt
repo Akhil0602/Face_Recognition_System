@@ -2,6 +2,7 @@ package com.example.str
 
 import android.Manifest
 import android.content.Context
+import android.content.res.Resources
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -14,6 +15,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
+import android.util.TypedValue
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -33,6 +35,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
 import java.io.*
 import java.util.concurrent.Executors
+import kotlin.math.round
 
 
 class MainActivity : AppCompatActivity() {
@@ -60,10 +63,18 @@ class MainActivity : AppCompatActivity() {
 
         lateinit var logTextView : TextView
         lateinit var abspath:String
-
+         var nw: Int=0
         fun setName(message: String) {
             logTextView.text = message
-            logTextView.setBackgroundColor(Color.GRAY)
+         /*   if(message=="Place your face in the frame to start scanning process")
+            {
+                logTextView.textSize=nw.toFloat()
+            }
+            else
+            {
+                logTextView.textSize=nw.toFloat()
+            }*/
+      //      logTextView.setBackgroundColor(Color.GRAY)
         }
 
     }
@@ -72,6 +83,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
 
       /*  val path = Environment.getDataDirectory().absolutePath.toString() + "/storage/emulated/0/appFolder"
         val mFolder = File(path)
@@ -84,11 +97,11 @@ class MainActivity : AppCompatActivity() {
 
         logTextView = findViewById<TextView>(R.id.res)
 
+
+
         sharedPreferences = getSharedPreferences(getString(R.string.app_name), Context.MODE_PRIVATE)
         isSerializedDataStored = sharedPreferences.getBoolean(SHARED_PREF_IS_DATA_STORED_KEY, false)
 
-//        Log.w("a", this.getExternalFilesDir(null).toString())
-       //  this.getExternalFilesDir(DOW)
 
         val file = File(this.getExternalFilesDir(null).toString() + "/images")
         if (!file.exists()) {
@@ -106,17 +119,10 @@ class MainActivity : AppCompatActivity() {
         frameAnalyser = FrameAnalyse(this, boundingBoxOverlay, faceNetModel)
         fileReader = FileReader(faceNetModel)
 
-
-
-
-
           opendir()
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 requestCameraPermission()
             }
-           // btn.isClickable=false
-           // btn.setBackgroundColor(Color.GRAY)
-
 
         var addPerson=findViewById<Button>(R.id.adduser)
         addPerson.setOnClickListener{
@@ -148,10 +154,6 @@ class MainActivity : AppCompatActivity() {
             bindPreview(cameraProvider)
         }, ContextCompat.getMainExecutor(this))
     }
-
-
-
-
 
     var cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (!isGranted) {
@@ -211,7 +213,7 @@ class MainActivity : AppCompatActivity() {
         //val tree = DocumentFile.fromTreeUri(this, childrenUri)
    @RequiresApi(Build.VERSION_CODES.N)
    fun load() {
-       val images = ArrayList<Pair<String, Bitmap>>()
+       val images = ArrayList<Pair<String , Bitmap>>()
        val tree = DocumentFile.fromFile(filee)
        var errorFound = false
 
@@ -230,7 +232,7 @@ class MainActivity : AppCompatActivity() {
                            break
                        }
                    }
-                   Log.w("Size", name.toString() + " " + images.size.toString())
+                //   Log.w("Size", name.toString() + " " + images.size.toString())
                } else {
                    errorFound = true
                }
@@ -267,9 +269,6 @@ class MainActivity : AppCompatActivity() {
         load()
     }
 
-
-
-
     private val fileReaderCallback = object : FileReader.ProcessCallback {
         override fun onProcessCompleted(data: ArrayList<Pair<String, FloatArray>>, numImagesWithNoFaces: Int) {
             Log.w("OPC", data.size.toString() + " " + numImagesWithNoFaces.toString())
@@ -290,6 +289,11 @@ class MainActivity : AppCompatActivity() {
         sharedPreferences.edit().putBoolean(SHARED_PREF_IS_DATA_STORED_KEY, true).apply()
     }
 
+
+    fun sett(x: Float)
+    {
+        nw = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, x, resources.displayMetrics).toInt()
+    }
 
     private fun loadSerializedImageData() : ArrayList<Pair<String, FloatArray>> {
         val serializedDataFile = File(filesDir, SERIALIZED_DATA_FILENAME)

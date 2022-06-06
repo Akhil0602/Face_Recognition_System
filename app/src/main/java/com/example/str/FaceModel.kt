@@ -84,7 +84,5 @@ class FaceModel(context : Context,
             output.loadArray( pixels )
             return output
         }
-
     }
-
 }

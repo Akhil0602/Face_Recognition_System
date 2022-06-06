@@ -8,6 +8,7 @@ import android.graphics.*
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.util.TypedValue
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.common.InputImage
@@ -27,6 +28,8 @@ class FrameAnalyse(
         private var boundingBoxOverlay: OverlayBox,
         private var model: FaceModel
 ): ImageAnalysis.Analyzer {
+
+
 
     lateinit var bestScoreUserName:String
 
@@ -77,11 +80,13 @@ class FrameAnalyse(
 
     private suspend fun runModel(faces: List<Face>, cameraFrameBitmap: Bitmap){
         withContext(Dispatchers.Default) {
+
            // Log.w("run","Model")
             if(faces.size==0)
             {
+
                 Handler(Looper.getMainLooper()).post(Runnable { //do stuff like remove view etc
-                    SetText.set("No Face Found")
+                    SetText.set("No Face found")
                 })
             }
             for (face in faces) {
@@ -130,7 +135,6 @@ class FrameAnalyse(
 
                         // Compute the average of all scores norms for each cluster.
                         val avgScores = nameScoreHashmap.values.map{ scores -> scores.toFloatArray().average() }
-//                        Logger.log( "Average score for each user : $nameScoreHashmap" )
 
                         val names = nameScoreHashmap.keys.toTypedArray()
                         nameScoreHashmap.clear()
@@ -172,7 +176,6 @@ class FrameAnalyse(
 
 
 
-
     // Compute the L2 norm of ( x2 - x1 )
     fun L2Norm(x1: FloatArray, x2: FloatArray) : Float {
         return sqrt(x1.mapIndexed { i, xi -> (xi - x2[i]).pow(2) }.sum())
@@ -186,4 +189,5 @@ class FrameAnalyse(
         val dot = x1.mapIndexed{ i, xi -> xi * x2[i] }.sum()
         return dot / (mag1 * mag2)
     }
+
 }
