@@ -3,31 +3,25 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#99ccff">
+    android:background="#25242B">
     <TextView
         android:id="@+id/welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add New User"
         android:layout_marginTop="10dp"
-        android:textSize="40dp"
+        android:textSize="25dp"
+        android:textColor="#ffffff"
         android:layout_centerHorizontal="true"
         android:textStyle="bold" />
-<androidx.camera.view.PreviewView
-    android:id="@+id/capture"
-    android:layout_below="@+id/welcome"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:layout_centerHorizontal="true"
-    android:layout_marginTop="25dp"
-    />
     <ImageView
         android:id="@+id/person"
         android:rotation="0"
         android:layout_width="350dp"
         android:layout_height="350dp"
+        android:src="@mipmap/ut"
         android:layout_below="@+id/welcome"
-        android:src="@mipmap/app_logo"
+        android:backgroundTint="@color/gray"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"/>
    <!-- <Button
@@ -73,13 +67,15 @@
     <EditText
         android:id="@+id/username"
         android:hint="Name"
+        android:textColorHint="@color/gray"
+        android:textColor="@color/white"
         android:layout_above="@+id/add"
         android:layout_width="300dp"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="50dp"
         android:layout_marginLeft="50dp"
         android:layout_height="60dp"
-        android:textSize="30dp"
+        android:textSize="25dp"
         />
     <Button
         android:id="@+id/add"
@@ -90,5 +86,14 @@
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Add atleast one image and a valid name to add a new user"
+        android:textSize="13dp"
+        android:textColor="#999999"
+        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

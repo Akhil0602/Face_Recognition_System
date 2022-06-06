@@ -2,17 +2,14 @@ package com.example.str
 
 import android.Manifest
 import android.content.Context
-import android.content.res.Resources
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
 import android.util.TypedValue
@@ -33,9 +30,9 @@ import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
+import pub.devrel.easypermissions.EasyPermissions
 import java.io.*
 import java.util.concurrent.Executors
-import kotlin.math.round
 
 
 class MainActivity : AppCompatActivity() {
@@ -54,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var frameAnalyser  : FrameAnalyse
     lateinit var faceNetModel : FaceModel
     lateinit var fileReader : FileReader
+    lateinit var preview:Preview
     val modelInfo = Model.FACENET
     lateinit var sharedPreferences: SharedPreferences
     lateinit var filee:File
@@ -120,9 +118,38 @@ class MainActivity : AppCompatActivity() {
         fileReader = FileReader(faceNetModel)
 
           opendir()
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestCameraPermission()
+
+
+        if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+            // Requesting the permission
+            ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.CAMERA), 100)
+        } /*else {
+            Toast.makeText(this@MainActivity, "Permission already granted", Toast.LENGTH_SHORT).show()
+        }*/
+
+     //   @RequiresApi(api = Build.VERSION_CODES.M)
+
+       // if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+       //     askAboutCamera()
+        //}
+
+        /*
+        val MY_PERMISSIONS_REQUEST_CAMERA = 0
+// Here, this is the current activity
+// Here, this is the current activity
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+            } else {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), MY_PERMISSIONS_REQUEST_CAMERA)
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
             }
+        }*/
+
+            /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestCameraPermission()
+            }*/
 
         var addPerson=findViewById<Button>(R.id.adduser)
         addPerson.setOnClickListener{
@@ -138,6 +165,10 @@ class MainActivity : AppCompatActivity() {
         {
             if(resultCode== RESULT_OK)
             {
+               // bindPreview(null)
+               //    var cam=findViewById<PreviewView>(R.id.previewView)
+                val cameraProvider = cameraProviderFuture.get()
+                   unbind(cameraProvider)
                 load()
             }
         }
@@ -155,6 +186,7 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     var cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
         if (!isGranted) {
             val alertDialog = AlertDialog.Builder(this).apply {
@@ -164,6 +196,7 @@ class MainActivity : AppCompatActivity() {
                 setPositiveButton("ALLOW") { dialog, which ->
                     dialog.dismiss()
                     requestCameraPermission()
+                    requestPermissions(Array(1) { Manifest.permission.CAMERA }, 100)
                 }
                 setNegativeButton("CLOSE") { dialog, which ->
                     dialog.dismiss()
@@ -176,8 +209,19 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun unbind(cameraProvider: ProcessCameraProvider?)
+    {
+        if (cameraProvider != null) {
+            if(cameraProvider.isBound(preview))
+            {
+                cameraProvider.unbindAll()
+                return
+            }
+        }
+    }
+
     private fun bindPreview(cameraProvider: ProcessCameraProvider?) {
-        var preview: Preview = Preview.Builder()
+         preview = Preview.Builder()
                 .build()
 
         var cameraSelector: CameraSelector = CameraSelector.Builder()
@@ -190,14 +234,33 @@ class MainActivity : AppCompatActivity() {
             .setTargetResolution(Size(480, 640))
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
+
         imageFrameAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), frameAnalyser)
         if (cameraProvider != null&& count==0) {
             cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview, imageFrameAnalysis)
-            count=1
         }
 
-
     }
+
+   /* @Override
+    private fun onRequestPermissionsResult(requestCode: Int, @NonNull permissions: Array<String?>?, @NonNull grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions!!, grantResults)
+        if (requestCode == 100) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show()
+            }
+        }
+    }*/
+
+   /* private fun askAboutCamera() {
+        EasyPermissions.requestPermissions(
+                this,
+                "A partir deste ponto a permissão de câmera é necessária.",
+                100,
+                Manifest.permission.CAMERA)
+    }*/
 
 
     /*Directory Selecting*/
@@ -213,7 +276,7 @@ class MainActivity : AppCompatActivity() {
         //val tree = DocumentFile.fromTreeUri(this, childrenUri)
    @RequiresApi(Build.VERSION_CODES.N)
    fun load() {
-       val images = ArrayList<Pair<String , Bitmap>>()
+       val images = ArrayList<Pair<String, Bitmap>>()
        val tree = DocumentFile.fromFile(filee)
        var errorFound = false
 
@@ -302,6 +365,22 @@ class MainActivity : AppCompatActivity() {
         objectInputStream.close()
         return data
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>,
+                                            grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this@MainActivity, "Camera Permission Granted", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@MainActivity, "Camera Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+        } /*else if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this@MainActivity, "Storage Permission Granted", Toast.LENGTH_SHORT).show()
+            } */
+        }
 
 }
 

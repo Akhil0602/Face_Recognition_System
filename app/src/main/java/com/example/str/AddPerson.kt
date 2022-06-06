@@ -110,14 +110,16 @@ class AddPerson : AppCompatActivity(){
                 if (!file.exists()) {
                     Toast.makeText(this, "User added Successfully",
                             Toast.LENGTH_LONG).show()
+                 /*   Toast.makeText(this, "Restart the app to sync data",
+                            Toast.LENGTH_LONG).show()*/
                     file.mkdirs()
                     Log.w("dirPAth", file.absolutePath)
-                    Toast.makeText(this, saveimage.size.toString() + " SIZE", Toast.LENGTH_LONG).show()
+                  //  Toast.makeText(this, saveimage.size.toString() + " SIZE", Toast.LENGTH_LONG).show()
                     var cc=0
                     for(image in saveimage) {
                         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
                         val fname = x + "_$timeStamp.jpg"
-                        Toast.makeText(this, cc.toString(), Toast.LENGTH_SHORT).show()
+                     //   Toast.makeText(this, cc.toString(), Toast.LENGTH_SHORT).show()
                         cc++
                         val file1: File = File(file, fname)
                         try {
@@ -153,7 +155,7 @@ class AddPerson : AppCompatActivity(){
             if(resultCode== Activity.RESULT_OK)
             {
                 var imagee= data?.extras?.get("data")as Bitmap
-                Toast.makeText(this,"Inside",Toast.LENGTH_SHORT).show()
+              //  Toast.makeText(this,"Inside",Toast.LENGTH_SHORT).show()
                 img.setImageBitmap(imagee)
                 saveimage.add(imagee)
             }
