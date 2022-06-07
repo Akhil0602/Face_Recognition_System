@@ -19,7 +19,12 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            /*minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'*/
+
+            minifyEnabled true
+            shrinkResources true
+        //    resConfigs "en"
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
