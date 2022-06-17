@@ -30,7 +30,6 @@ import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
-import pub.devrel.easypermissions.EasyPermissions
 import java.io.*
 import java.util.concurrent.Executors
 
@@ -55,6 +54,7 @@ class MainActivity : AppCompatActivity() {
     val modelInfo = Model.FACENET
     lateinit var sharedPreferences: SharedPreferences
     lateinit var filee:File
+    var isi:Boolean=false
 
 
     companion object {
@@ -81,7 +81,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
 
       /*  val path = Environment.getDataDirectory().absolutePath.toString() + "/storage/emulated/0/appFolder"
@@ -167,12 +166,15 @@ class MainActivity : AppCompatActivity() {
             {
                // bindPreview(null)
                //    var cam=findViewById<PreviewView>(R.id.previewView)
-                val cameraProvider = cameraProviderFuture.get()
-                   unbind(cameraProvider)
+                   if(isi) {
+                       val cameraProvider = cameraProviderFuture.get()
+                       unbind(cameraProvider)
+                   }
                 load()
             }
         }
     }
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun requestCameraPermission() {
         cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
     }
@@ -180,6 +182,7 @@ class MainActivity : AppCompatActivity() {
     fun startCam()
     {
         cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+        isi=true
         cameraProviderFuture.addListener(Runnable {
             val cameraProvider = cameraProviderFuture.get()
             bindPreview(cameraProvider)

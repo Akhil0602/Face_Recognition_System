@@ -2,25 +2,20 @@ package com.example.str
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
+import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
-import android.util.Size
-import android.util.TypedValue
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
-import androidx.camera.core.impl.utils.executor.CameraXExecutors
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import com.google.common.util.concurrent.ListenableFuture
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -43,7 +38,9 @@ class AddPerson : AppCompatActivity(){
     lateinit var imageCapture: ImageCapture
     lateinit var confirm:Button
     lateinit var addimg: Button
+    lateinit var thumbnail:Bitmap
 
+    var imageUri: Uri?=null
     lateinit var saveimage: MutableList<Bitmap>
 
     @SuppressLint("RestrictedApi")
@@ -86,7 +83,13 @@ class AddPerson : AppCompatActivity(){
 */
           addimg.setOnClickListener {
 
+              var values = ContentValues()
+              values.put(MediaStore.Images.Media.TITLE, "New Picture")
+              values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera")
+              imageUri = contentResolver.insert(
+                      MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
               val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+              cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
               startActivityForResult(cameraIntent, CAMERA_REQUEST)
 
         }
@@ -100,7 +103,7 @@ class AddPerson : AppCompatActivity(){
                 Toast.makeText(this, "Please Enter a valid name", Toast.LENGTH_SHORT).show()
             }
             else if(saveimage.size==0){
-                Toast.makeText(this,"Please add an image first",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please add an image first", Toast.LENGTH_SHORT).show()
             }
             else {
                 val abspth=MainActivity.abspath
@@ -117,8 +120,9 @@ class AddPerson : AppCompatActivity(){
                   //  Toast.makeText(this, saveimage.size.toString() + " SIZE", Toast.LENGTH_LONG).show()
                     var cc=0
                     for(image in saveimage) {
+                       // Toast.makeText(this, cc.toString(), Toast.LENGTH_SHORT).show()
                         val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-                        val fname = x + "_$timeStamp.jpg"
+                        val fname = x + "_${timeStamp}_${cc}.jpg"
                      //   Toast.makeText(this, cc.toString(), Toast.LENGTH_SHORT).show()
                         cc++
                         val file1: File = File(file, fname)
@@ -154,43 +158,65 @@ class AddPerson : AppCompatActivity(){
         {
             if(resultCode== Activity.RESULT_OK)
             {
-                var imagee= data?.extras?.get("data")as Bitmap
+               /* var imagee= data?.extras?.get("data")as Bitmap
               //  Toast.makeText(this,"Inside",Toast.LENGTH_SHORT).show()
-                img.setImageBitmap(imagee)
-                saveimage.add(imagee)
+                img.setImageBitmap(imagee)*/
+
+                try {
+                    thumbnail = MediaStore.Images.Media.getBitmap(
+                            contentResolver, imageUri)
+                    thumbnail=BM.rotateBitmap(thumbnail,90f)
+                    var imageurl = getRealPathFromURI(imageUri)
+                    img.setImageBitmap(thumbnail)
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                }
+
+                saveimage.add(thumbnail)
+             //   Toast.makeText(this, saveimage.size.toString(), Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-  /*  fun startCam()
-    {
-        var cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-        cameraProviderFuture.addListener(Runnable {
-            val cameraProvider = cameraProviderFuture.get()
-            bindPreview(cameraProvider)
-        }, ContextCompat.getMainExecutor(this))
+    private fun getRealPathFromURI(imageUri: Uri?): Any {
 
+        val proj = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor: Cursor = managedQuery(imageUri, proj, null, null, null)
+        val column_index: Int = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+        cursor.moveToFirst()
+        return cursor.getString(column_index)
     }
 
-    private fun bindPreview(cameraProvider: ProcessCameraProvider?) {
-        var preview: Preview = Preview.Builder()
-                .build()
+    /*  fun startCam()
+      {
+          var cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+          cameraProviderFuture.addListener(Runnable {
+              val cameraProvider = cameraProviderFuture.get()
+              bindPreview(cameraProvider)
+          }, ContextCompat.getMainExecutor(this))
 
-        var cameraSelector: CameraSelector = CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
-                .build()
-        var previewww = findViewById<PreviewView>(R.id.capture)
-        preview.setSurfaceProvider(previewww.surfaceProvider)
+      }
 
-        val imageFrameAnalysis = ImageAnalysis.Builder()
-                .setTargetResolution(Size(480, 640))
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-        if (cameraProvider != null) {
-            cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview, imageFrameAnalysis)
-        }
-    }
-*/
+      private fun bindPreview(cameraProvider: ProcessCameraProvider?) {
+          var preview: Preview = Preview.Builder()
+                  .build()
+
+          var cameraSelector: CameraSelector = CameraSelector.Builder()
+                  .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
+                  .build()
+          var previewww = findViewById<PreviewView>(R.id.capture)
+          preview.setSurfaceProvider(previewww.surfaceProvider)
+
+          val imageFrameAnalysis = ImageAnalysis.Builder()
+                  .setTargetResolution(Size(480, 640))
+                  .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                  .build()
+          if (cameraProvider != null) {
+              cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview, imageFrameAnalysis)
+          }
+      }
+  */
 //    @SuppressLint("RestrictedApi")
    /* fun capt(){
 
